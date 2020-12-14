@@ -182,8 +182,8 @@ class DdpClient
     _reconnectListenersHolder.removeReconnectListener(listener);
   }
 
-  void _log(String msg) {
-    print('[DdpClient - ${_name}] $msg');
+  void _log(dynamic msg) {
+    debugPrint('[DdpClient - ${_name}] $msg');
   }
 
   String get session => _session;
@@ -466,6 +466,10 @@ class DdpClient
   void _initMessageHandlers() {
     this._messageHandlers = {};
     this._messageHandlers['connected'] = (msg) {
+      if (this._pingTimer != null) {
+        this._pingTimer.cancel();
+      }
+
       this._status(ConnectStatus.connected);
       this._collections.values.forEach((c) => c._init());
       this._version = '1';
@@ -506,7 +510,7 @@ class DdpClient
         final id = msg['id'] as String;
         final runningSub = this._subs[id];
         if (runningSub != null) {
-          print(runningSub);
+          this._log(runningSub);
           this._log('Subscription returned a nosub error $msg');
           runningSub.error =
               ArgumentError('Subscription returned a nosub error');
