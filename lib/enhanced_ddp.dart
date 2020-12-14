@@ -5,7 +5,6 @@ import 'dart:convert';
 
 import 'package:tuple/tuple.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:flutter/material.dart';
 
 part 'enhanced_ddp_client.dart';
 part 'enhanced_ddp_collection.dart';

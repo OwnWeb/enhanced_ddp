@@ -98,6 +98,7 @@ class DdpClient
   ReaderStats _readSocketStats;
   ReaderStats _readStats;
   ReaderLogger _readLog;
+  StreamSubscription<dynamic> _readStatsFlag;
 
   int _reconnects;
   int _pingsIn;
@@ -183,7 +184,7 @@ class DdpClient
   }
 
   void _log(dynamic msg) {
-    debugPrint('[DdpClient - ${_name}] $msg');
+    print('[DdpClient - ${_name}] $msg');
   }
 
   String get session => _session;
@@ -568,8 +569,12 @@ class DdpClient
     this._messageHandlers['updated'] = (msg) {};
   }
 
-  void inboxManager() {
-    this._readStats.listen((event) {
+  void inboxManager() async {
+    if (this._readStatsFlag != null) {
+      await this._readStatsFlag.cancel();
+      this._readStatsFlag = null;
+    }
+    this._readStatsFlag = this._readStats.listen((event) {
       final message = json.decode(event) as Map<String, dynamic>;
       if (message.containsKey('msg')) {
         final mtype = message['msg'];
